@@ -1,5 +1,5 @@
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const express = require('express')
 const app =express();
 const cors = require('cors')
@@ -32,6 +32,7 @@ async function run() {
 
     const recentBlogCollection =client.db('ChildCareDB').collection('recentBlog');
     const allBlogCollection =client.db('ChildCareDB').collection('allBlog');
+    const wishListBlogCollection =client.db('ChildCareDB').collection('wishlist');
     const newLetterCollection =client.db('ChildCareDB').collection('newLetter');
 
     app.get('/recentBlog',async(req,res)=>{
@@ -50,11 +51,44 @@ async function run() {
       res.send(result)
    })
      app.get('/allBlog',async(req,res)=>{
-      const cursor =allBlogCollection.find()
+      const queryObj ={}
+      const category =req.query.category;
+      if(category){
+        queryObj.category=category
+      }
+      const cursor =allBlogCollection.find(queryObj)
       const result =await cursor.toArray()
       res.send(result)
     })
+     app.get('/allBlog/:id',async(req,res)=>{
+      const id =req.params.id;
+      const query ={_id:new ObjectId(id)}
+      const result =await allBlogCollection.findOne(query)
+      
+      res.send(result)
+    })
+    app.post('/wishlist',async(req,res)=>{
+      
 
+      const wishList =req.body
+      const result = await wishListBlogCollection.insertOne(wishList)
+      res.send(result)
+   })
+   
+   app.get('/wishlist',async(req,res)=>{
+    console.log(req.query.email)
+    // const query=req.body
+    let query ={};
+    // if(req.query.email !==req.user?.email){
+    //   return res.status(403).send({message:'forbidden access'})
+    // }
+    if(req.query?.email){
+      query ={email: req.query.email}
+    }
+    const cursor =wishListBlogCollection.find(query)
+    const result =await cursor.toArray()
+    res.send(result)
+  })
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
