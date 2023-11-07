@@ -89,6 +89,28 @@ async function run() {
     const result =await cursor.toArray()
     res.send(result)
   })
+
+  //update data by id
+  app.put('/allBlog/:id',async(req,res)=>{
+    const id =req.params.id
+    const filter ={_id: new ObjectId(id)}
+    const options = { upsert: true };
+     const updateBlog=req.body;
+     const blogPost ={
+    $set:{    
+      
+      title:updateBlog.title,
+      category:updateBlog.category,
+      image:updateBlog.image,
+      description:updateBlog.description,
+      date:updateBlog.price,
+      long_description:updateBlog.long_description,
+      
+    }
+  }
+  const result = await allBlogCollection.updateOne(filter,blogPost,options)
+   res.send(result)
+  })
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
