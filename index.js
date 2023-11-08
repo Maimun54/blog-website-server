@@ -67,14 +67,30 @@ async function run() {
       
       res.send(result)
     })
-    app.post('/wishlist',async(req,res)=>{
+     app.get('/wishlist/:id',async(req,res)=>{
+      const id =req.params.id;
+      const query ={_id:new ObjectId(id)}
+      const result =await wishListBlogCollection.findOne(query)
       
-
-      const wishList =req.body
-      const result = await wishListBlogCollection.insertOne(wishList)
       res.send(result)
-   })
+    })
+  
    
+   app.post('/wishlist', async (req, res) => {
+    const wishList = req.body;
+    const alreadyHave = await wishListBlogCollection.findOne({ _id: wishList._id });
+  
+    if (alreadyHave) {
+      
+      res.status(403).send({message:'Document with the same _id already exists'})
+    } else {
+      // Insert the new document
+      const result = await wishListBlogCollection.insertOne(wishList);
+      res.json(result);
+    }
+  });
+  
+   //
    app.get('/wishlist',async(req,res)=>{
     console.log(req.query.email)
     // const query=req.body
