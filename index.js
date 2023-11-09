@@ -30,16 +30,12 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
-    const recentBlogCollection =client.db('ChildCareDB').collection('recentBlog');
+   
     const allBlogCollection =client.db('ChildCareDB').collection('allBlog');
     const wishListBlogCollection =client.db('ChildCareDB').collection('wishlist');
     const newLetterCollection =client.db('ChildCareDB').collection('newLetter');
 
-    app.get('/recentBlog',async(req,res)=>{
-        const recentBlog = recentBlogCollection.find()
-        const result =await recentBlog.toArray()
-        res.send(result)
-    })
+    
     app.post('/subscribe',async(req,res)=>{
       const newBlog =req.body
       const result = await newLetterCollection.insertOne(newBlog)
@@ -75,19 +71,24 @@ async function run() {
       res.send(result)
     })
   
+     // delete date from my wish page
+    
+     app.delete('/wishlist/:id',async(req,res)=>{
+      const id =req.params.id
+      console.log(id)
+      const query ={_id:new ObjectId(id)}
+      const result = await wishListBlogCollection.deleteOne(query)
+      res.send(result)
+    })
    
+  
    app.post('/wishlist', async (req, res) => {
     const wishList = req.body;
-    const alreadyHave = await wishListBlogCollection.findOne({ _id: wishList._id });
-  
-    if (alreadyHave) {
-      
-      res.status(403).send({message:'Document with the same _id already exists'})
-    } else {
+    
       // Insert the new document
       const result = await wishListBlogCollection.insertOne(wishList);
       res.json(result);
-    }
+    
   });
   
    //
