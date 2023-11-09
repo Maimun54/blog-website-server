@@ -33,6 +33,7 @@ async function run() {
     const wishListBlogCollection =client.db('ChildCareDB').collection('wishlist');
     const newLetterCollection =client.db('ChildCareDB').collection('newLetter');
     const awarenessCollection =client.db('ChildCareDB').collection('recentBlog');
+    const commentCollection =client.db('ChildCareDB').collection('comment');
 
     
     app.post('/subscribe',async(req,res)=>{
